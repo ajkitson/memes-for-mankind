@@ -38,7 +38,7 @@
 
       function init () {
         messenger.onready(function () {
-          messenger.initAsUser('ChromeCast');
+          messenger.init('ChromeCast');
           allSet = true;
 
           messenger.onmessage(function (type, data, sender) {

@@ -18,7 +18,19 @@
       'app.prompt',
       'app.done',
       'app.core',
-      'app.config'
+      'app.config',
+
+      /*
+       * Services
+       */
+
+      'app.data-service',
+      'app.player-user',
+      /*
+       * Messaging
+       */
+      'app.player-messenger',
+      'app.messaging'
   ])
   .config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
   //

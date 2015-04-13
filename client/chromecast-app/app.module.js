@@ -12,7 +12,8 @@
       'app.game',
       'app.game-messenger',
       'app.messaging',
-      'app.config'
+      'app.config',
+      'app.core'
     ])
   .config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
 
