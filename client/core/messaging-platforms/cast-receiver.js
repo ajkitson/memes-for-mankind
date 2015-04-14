@@ -31,40 +31,47 @@
       castReceiverManager.onReady = function(event) {
         ready = true;
         window.castReceiverManager.setApplicationState('Application status is ready...');
-        if (readyHandler) readyHandler(); // from onready
+        if (readyHandler) {
+          readyHandler(); // from onready
+        }
       };
 
       castReceiverManager.onSenderConnected = function(event) {
-        //toastr.info('Received Sender Connected event: ' + event.data);
+        toastr.info('Received Sender Connected event: ' + event.data);
       };
 
       castReceiverManager.onSenderDisconnected = function(event) {
-        //toastr.info('Received Sender Disconnected event: ' + event.data);
-        if (window.castReceiverManager.getSenders().length == 0 &&
-          event.reason == cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER) {
+        toastr.info('Received Sender Disconnected event: ' + event.data);
+        if (window.castReceiverManager.getSenders().length === 0 &&
+          event.reason === cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER) {
         window.close();
         }
       };
 
-      // initialize the CastReceiverManager with an application status message
-      window.castReceiverManager.start({statusText: 'Application is starting'});
     }
 
     function setupMessageHandler (messageHandler) {
       // create a CastMessageBus to handle messages for a custom namespace
       window.messageBus = window.castReceiverManager.getCastMessageBus(chromecastNamespace);
       window.messageBus.onMessage = function(event) {
-        //toastr.info('Message Received!' + event.data);
+        toastr.info('Message Received!' + event.data);
         var data = JSON.parse(event.data);
         // saving a mapping of usernames to senderId's to allow message passing
         senders[data.sender] = event.senderId;
         messageHandler(data.type, data.data, data.sender);
       };
+
+      // initialize the CastReceiverManager with an application status message
+      window.castReceiverManager.start({statusText: 'Application is starting'});
     }
 
     function send (type, data, recipient) {
-      if (!type) throw new Error('all messages must have a type');
-      if (!recipient) throw new Error('message must have a receipient before you can send a message');
+      if (!type) {
+        throw new Error('all messages must have a type');
+      }
+      if (!recipient) {
+        throw new Error('message must have a receipient before you can send a message');
+      }
 
       window.messageBus.send(senders[recipient], JSON.stringify({
         recipient: recipient,
@@ -83,7 +90,7 @@
         }));
     }
 
-    function setupReadyHandler (readyHandler) {
+    function setupReadyHandler (handler) {
       if (ready) {
         handler();
       } else {

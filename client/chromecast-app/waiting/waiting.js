@@ -9,7 +9,7 @@
 
     function Waiting(gameMessenger, game, $state) {
       var vm = this;
-
+      toastr.info('in waiting view!')
       vm.mainContent = {
         waitingForPlayers: {
           text: 'Where are your friends? You\'ve gotta have at least 3!',
