@@ -3,9 +3,9 @@
   angular.module('app.game-messenger', [])
     .factory('gameMessenger', gameMessenger);
 
-    gameMessenger.$inject = ['messenger', 'socketDev', 'chromecastNamespace', 'events'];
+    gameMessenger.$inject = ['messenger', 'socketDev', 'events'];
 
-    function gameMessenger (messenger, socketDev, chromecastNamespace, events) {
+    function gameMessenger (messenger, socketDev, events) {
 
       // Supported Events:
       // - playerJoined

@@ -4,47 +4,51 @@
   angular.module('app.cast-receiver', [])
     .factory('castReceiverMessenger', castReceiverMessenger);
 
-  castReceiverMessenger.$inject = [];
+  castReceiverMessenger.$inject = ['chromecastNamespace'];
 
-  function castReceiverMessenger () {
+  function castReceiverMessenger (chromecastNamespace) {
     var senders = {}; // store senderIds with human readable names as keys
     var sender = 'ChromeCast';
     var ready = false;
     var readyHandler;
 
-    cast.receiver.logger.setLevelValue(0);
-    window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
-
-    castReceiverManager.onReady = function(event) {
-      ready = true;
-      window.castReceiverManager.setApplicationState('Application status is ready...');
-      if (readyHandler) readyHandler(); // from onready
-    };
-
-    castReceiverManager.onSenderConnected = function(event) {
-      //toastr.info('Received Sender Connected event: ' + event.data);
-    };
-
-    castReceiverManager.onSenderDisconnected = function(event) {
-      //toastr.info('Received Sender Disconnected event: ' + event.data);
-      if (window.castReceiverManager.getSenders().length == 0 &&
-        event.reason == cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER) {
-      window.close();
-      }
-    };
-
-    // initialize the CastReceiverManager with an application status message
-    window.castReceiverManager.start({statusText: 'Application is starting'});
+    setUpCC();
 
     return {
       init: function () {}, // nothing caller needs to init, everything taken care of above, when injected
       connect: function () {}, // We don't need this on the receiver client, but calling connect shouldn't result in an error
       connectionStatus: function () {}, // not implemented yet
+      onmessage: setupMessageHandler,
+      onready: setupReadyHandler,
       send: send,
       broadcast: broadcast,
-      onmessage: setupMessageHandler,
-      onready: setupReadyHandler
     };
+
+    function setUpCC () {
+      cast.receiver.logger.setLevelValue(0);
+      window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
+
+      castReceiverManager.onReady = function(event) {
+        ready = true;
+        window.castReceiverManager.setApplicationState('Application status is ready...');
+        if (readyHandler) readyHandler(); // from onready
+      };
+
+      castReceiverManager.onSenderConnected = function(event) {
+        //toastr.info('Received Sender Connected event: ' + event.data);
+      };
+
+      castReceiverManager.onSenderDisconnected = function(event) {
+        //toastr.info('Received Sender Disconnected event: ' + event.data);
+        if (window.castReceiverManager.getSenders().length == 0 &&
+          event.reason == cast.receiver.system.DisconnectReason.REQUESTED_BY_SENDER) {
+        window.close();
+        }
+      };
+
+      // initialize the CastReceiverManager with an application status message
+      window.castReceiverManager.start({statusText: 'Application is starting'});
+    }
 
     function setupMessageHandler (messageHandler) {
       // create a CastMessageBus to handle messages for a custom namespace

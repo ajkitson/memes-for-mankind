@@ -6,8 +6,6 @@
   playerMessenger.$inject = ['messenger', 'events'];
 
   function playerMessenger (messenger, events) {
-
-    // TODO: get rid of these! make gameRecipient an app constant, user a service, maybe defer to messenger
     var gameRecipient = 'ChromeCast';
 
     // Supported events:
@@ -17,9 +15,12 @@
     // - done - round over
     // - startNextRound - begin round over again
     messenger.onmessage(events.trigger);
+    messenger.onready(function () {
+      events.trigger('chromecastConnection');
+    })
 
     return {
-      // methods we implement
+      // game-level methods we implement
       join: join,
       ready: ready,
       submit: submit,  //prompt or meme
@@ -28,8 +29,8 @@
 
       // methods we defer to other modules
       on: events.on,
-      init: messenger.init, //remove??
-      connect: messenger.connect,
+      init: messenger.init,  // gets the messenger all set up (e.g. with a sender name)
+      connect: messenger.connect, // actually connects to other clients (sockets doesn't use this)
       getConnectionStatus: messenger.connectionStatus
     };
 
