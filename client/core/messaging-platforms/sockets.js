@@ -10,10 +10,15 @@
     var socket = new WebSocket('ws://127.0.0.1:3434'); //only use sockets for local dev
     var ready = false;
     var sender;
+    var queuedMessages = [];
 
-    socket.onopen = function () {
+    var readyTasks = function () {
       ready = true;
+      queuedMessages.forEach(function (message) {
+        send.apply(undefined, message);
+      });
     };
+    socket.onopen = readyTasks;
 
     return {
       init: init,
@@ -39,7 +44,7 @@
         readyHandler();
       } else {
         socket.onopen = function() {
-          ready = true;
+          readyTasks();
           readyHandler();
         };
       }
@@ -55,14 +60,17 @@
     function send (type, data, recipient) {
       if (!type) throw new Error('all messages must have a type');
       if (!sender) throw new Error('must instantiate a sender before you can send a message');
-      if (!ready) throw new Error('must wait until socket is open before you can send a message');
 
-      socket.send(JSON.stringify({
-        recipient: recipient,
-        data: data,
-        type: type,
-        sender: sender
-      }));
+      if (!ready) {
+        queuedMessages.push([type, data, recipient]);
+      } else {
+        socket.send(JSON.stringify({
+          recipient: recipient,
+          data: data,
+          type: type,
+          sender: sender
+        }));
+      }
     }
 
     // if socket server sees recipient is 'broadcast', it sends

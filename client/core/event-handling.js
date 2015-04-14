@@ -12,14 +12,23 @@
       trigger: trigger
     };
 
+
     function trigger (event, data, sender) {
       var handlers = eventHandlers[event];
       if (handlers) {
-        $rootScope.$apply(function () {
-          handlers.forEach(function (fn) {
-            fn(data, sender);
+        if (!$rootScope.$$phase) { // don't use $apply if already in a digest cycle
+          $rootScope.$apply(function () {
+            runHandlers(handlers);
           });
-        });
+        } else {
+          runHandlers(handlers);
+        }
+      }
+
+      function runHandlers () {
+        handlers.forEach(function (fn) {
+          fn(data, sender);
+        })
       }
     }
 
